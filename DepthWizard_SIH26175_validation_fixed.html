@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DepthWizard | SIH26175 | ISRO</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;overflow-x:hidden}
+body{background:#061018;color:#eef8fb;font:13px system-ui,Arial,sans-serif}
+button{cursor:pointer}
+
+aside{
+  position:fixed;left:0;top:0;bottom:0;width:235px;
+  background:#071119;border-right:1px solid #203641;
+  padding:18px 13px;z-index:100;
+  transition:transform .22s ease,opacity .22s ease;
+}
+.brand{font-size:19px;font-weight:900;margin:4px 8px 25px;white-space:nowrap}
+.brand span{color:#54dfff}
+.logo{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#54dfff;color:#031117;margin-right:8px}
+.nav button{display:block;width:100%;text-align:left;background:transparent;color:#8ea8b3;border:0;border-radius:8px;padding:11px;margin:2px 0}
+.nav button.active,.nav button:hover{background:#102630;color:white}
+.foot{position:absolute;bottom:15px;left:14px;right:14px;border:1px solid #203641;padding:10px;border-radius:9px;color:#8ea8b3;font-size:10px}
+.sidebar-close{position:absolute;right:10px;top:10px;width:30px;height:30px;border:1px solid #284753;border-radius:7px;background:#0b1922;color:#fff;font-size:18px}
+
+.main{
+  margin-left:235px;
+  width:calc(100% - 235px);
+  max-width:none;
+  padding:28px clamp(18px,3vw,42px);
+  min-width:0;
+}
+.page{display:none;min-width:0;max-width:1500px;margin:0 auto}
+.page.active{display:block}
+
+.top{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  gap:18px;
+  margin-bottom:18px;
+  min-height:88px;
+}
+.top>div:first-child{grid-column:2;grid-row:1;text-align:center;min-width:0}
+.top>.btn,.top>div:last-child:not(:first-child){grid-column:3;grid-row:1;justify-self:end}
+.top>.btn:only-child{grid-column:3}
+.ey{color:#54dfff;font-size:9px;letter-spacing:.18em;font-weight:900}
+.title{font-size:28px;font-weight:950;margin:4px 0;line-height:1.12}
+.sub{color:#8ea8b3;line-height:1.4}
+.muted{color:#8ea8b3}
+
+.btn{background:#0c1b24;color:white;border:1px solid #203641;padding:9px 12px;border-radius:8px}
+.primary{background:#54dfff;color:#031117;border-color:#54dfff;font-weight:800}
+
+.grid4,.grid3,.grid2,.steps,.controls,.stats{min-width:0}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:#0b1922;border:1px solid #203641;border-radius:12px;padding:15px;min-width:0;overflow:hidden}
+.card h3{margin:0 0 12px}
+.metric{font-size:25px;font-weight:950;margin:5px 0}
+.green{color:#56e0a3}.cyan{color:#54dfff}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.step{border:1px solid #203641;background:#08151c;border-radius:8px;padding:10px;min-height:70px;min-width:0}
+.step b{display:block;margin:5px 0;font-size:11px}
+.step small,.label{color:#8ea8b3;font-size:9px}
+.drop{height:235px;border:1px dashed #376271;border-radius:10px;display:grid;place-items:center;text-align:center;background:#09161d}
+.upload{font-size:40px;color:#54dfff}
+.preview{display:none;width:100%;height:235px;object-fit:cover;border-radius:10px}
+.field{background:#08141b;border:1px solid #172d37;padding:9px;border-radius:7px;margin-top:8px;min-width:0}
+.field small{display:block;color:#8ea8b3}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #192d36;min-width:0}
+.row>*{min-width:0;overflow-wrap:anywhere}
+.pill{font-size:9px;border-radius:99px;padding:4px 7px;background:#10313c;color:#62dfff;white-space:nowrap}
+.ok{background:#12382e;color:#66eab0}.wait{background:#102630;color:#54dfff}
+.viewer{height:310px;border:1px solid #284753;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:#071319}
+.heat{width:88%;height:78%;background:linear-gradient(135deg,#143640,#36747a 40%,#b6c66b 70%,#203c40);clip-path:polygon(0 78%,12% 58%,24% 67%,38% 33%,49% 52%,62% 18%,76% 49%,88% 29%,100% 56%,100% 100%,0 100%)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 7px;border-bottom:1px solid #192d36;font-size:11px}
+th{color:#8ea8b3}
+.controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:10px}
+.control{background:#08151c;border:1px solid #203641;border-radius:8px;padding:10px;min-width:0}
+.control input,.control select,.card select{width:100%;margin-top:8px;background:#07141b;color:white;border:1px solid #203641;padding:7px;border-radius:6px}
+.terrain{height:410px;position:relative;border:1px solid #284753;border-radius:10px;overflow:hidden;background:linear-gradient(#08171d,#0c2b30)}
+canvas{width:100%;height:100%}
+.hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:10px;pointer-events:none}
+.hud span{background:#061018dd;border:1px solid #284753;padding:7px;border-radius:6px;font-size:9px}
+.views{position:absolute;right:10px;bottom:10px;display:flex;gap:4px}
+.views button{background:#07151ddd;color:white;border:1px solid #315461;border-radius:6px;padding:7px}
+.notice{border-left:3px solid #54dfff;background:#0b1922;padding:10px;color:#a9c3cc;font-size:10px;margin-top:10px}
+.toast{display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(420px,calc(100vw - 32px));background:#102630;border:1px solid #35606d;padding:9px 12px;border-radius:8px;z-index:200;box-shadow:0 8px 24px #0008;line-height:1.35;font-size:11px;text-align:center;pointer-events:none}
+.demo-modal{position:fixed;inset:0;background:#061018ef;z-index:150;display:none;align-items:center;justify-content:center}
+.demo-box{width:min(520px,90vw);background:#0b1922;border:1px solid #54dfff;border-radius:14px;padding:24px}
+.demo-bar{height:6px;background:#17303a;border-radius:99px;overflow:hidden;margin-top:16px}
+.demo-bar i{display:block;height:100%;width:0;background:#54dfff;transition:width .35s}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.stat{background:#08151c;border:1px solid #203641;border-radius:8px;padding:9px;min-width:0}
+.stat small{display:block;color:#8ea8b3}
+.depth-canvas{width:100%;height:260px;border-radius:10px;border:1px solid #284753;background:#071319;display:block}
+.hidden{display:none!important}
+
+.sidebar-hidden aside{transform:translateX(-110%);opacity:0;pointer-events:none}
+.sidebar-hidden .main{margin-left:0;width:100%;padding-left:clamp(18px,3vw,42px);padding-right:clamp(18px,3vw,42px)}
+.sidebar-toggle{
+  position:fixed;left:18px;top:14px;z-index:160;
+  width:42px;height:42px;border-radius:9px;background:#0b1922;
+  color:#54dfff;border:1px solid #54dfff;font-size:20px;
+  display:none;place-items:center;box-shadow:0 6px 18px #0008;
+}
+.sidebar-hidden .sidebar-toggle{display:grid}
+.sidebar-open .sidebar-toggle{display:none}
+
+@media(max-width:1100px){
+  .grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:1100px){
+  .top{
+    grid-template-columns:minmax(0,1fr);
+    justify-items:center;
+    gap:10px;
+    padding:0 60px;
+  }
+  .top>div:first-child{
+    grid-column:1;
+    grid-row:1;
+    width:100%;
+    max-width:760px;
+    text-align:center;
+  }
+  .top>.btn,.top>div:last-child:not(:first-child){
+    grid-column:1;
+    grid-row:2;
+    justify-self:center;
+  }
+  .top .sub{
+    max-width:680px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+}
+
+@media(max-width:900px){
+  aside{width:235px;box-shadow:8px 0 30px #0008}
+  .main,.sidebar-open .main{
+    margin-left:0;
+    width:100%;
+    padding-left:15px;
+    padding-right:15px;
+  }
+  .sidebar-open aside{transform:translateX(0);opacity:1;pointer-events:auto}
+  .sidebar-open .main{filter:none}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .top{
+    margin-bottom:20px;
+    min-height:0;
+    padding:0 58px;
+  }
+  .title{font-size:26px}
+  .sub{
+    font-size:12px;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+  }
+}
+
+@media(max-width:600px){
+  .toast{bottom:12px;width:calc(100vw - 24px)}
+  .toast{top:205px;right:12px;width:calc(100vw - 24px)}
+  .main,.sidebar-hidden .main{padding:68px 15px 15px}
+  .top{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    padding:0 12px;
+    gap:11px;
+    margin-bottom:18px;
+  }
+  .top>div:first-child{
+    order:1;
+    width:100%;
+    max-width:100%;
+    text-align:center;
+  }
+  .top>.btn,.top>div:last-child:not(:first-child){
+    order:2;
+    align-self:center;
+  }
+  .ey{font-size:8px}
+  .title{
+    font-size:23px;
+    line-height:1.15;
+    white-space:normal;
+  }
+  .sub{
+    font-size:11px;
+    line-height:1.45;
+    max-width:340px;
+    margin:5px auto 0;
+  }
+  .grid4,.grid3,.grid2,.steps,.controls{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hud{font-size:8px}
+  .process-track{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+.process-track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.process-item{background:#08151c;border:1px solid #203641;border-radius:8px;padding:9px;min-width:0;transition:.2s}
+.process-item span{display:block;color:#8ea8b3;font-size:9px}
+.process-item b{display:block;margin-top:3px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.process-item.active{border-color:#54dfff;background:#0c2730;box-shadow:inset 0 -2px #54dfff}
+.process-item.done{border-color:#56e0a3}
+.process-meta{display:flex;justify-content:space-between;color:#8ea8b3;font-size:10px;margin-top:10px}
+.process-line{height:4px;background:#17303a;border-radius:99px;overflow:hidden;margin-top:7px}
+.process-line i{display:block;height:100%;width:0;background:#54dfff;transition:width .3s ease}
+.depth-tools{display:flex;align-items:center;gap:12px;margin-top:10px}
+.depth-tools label{display:flex;align-items:center;gap:8px;color:#8ea8b3;font-size:10px;flex:1}
+.depth-tools input{width:100%}
+.terrain-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.terrain-stats>div{background:#08151c;border:1px solid #203641;border-radius:8px;padding:9px}
+.terrain-stats small{display:block;color:#8ea8b3;font-size:9px}
+.terrain-stats b{display:block;margin-top:4px}
+@media(max-width:900px){.process-track{grid-template-columns:repeat(3,minmax(0,1fr))}.terrain-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.process-track{grid-template-columns:repeat(2,minmax(0,1fr))}.depth-tools{flex-direction:column;align-items:stretch}.terrain-stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="demoModal" class="demo-modal"><div class="demo-box"><div class="ey">DEPTHWIZARD • SIH26175</div><h2>Running browser demonstration</h2><p id="demoText" class="muted">Preparing…</p><div class="demo-bar"><i id="demoBar"></i></div></div></div>
+<button id="sidebarToggle" class="sidebar-toggle" aria-label="Open navigation">☰</button><aside><button id="sidebarClose" class="sidebar-close" aria-label="Close navigation">×</button><div class="brand"><span class="logo">DW</span><strong>Depth<span>Wizard</span></strong></div><nav class="nav">
+<button class="active" data-page="dash">◈ <span>Mission Dashboard</span></button><button data-page="ingest">⇧ <span>Image Ingestion</span></button><button data-page="depth">◒ <span>Depth Estimation</span></button><button data-page="cal">⌖ <span>Scale Calibration</span></button><button data-page="dsm">▦ <span>DSM / rDSM</span></button><button data-page="terrain">◇ <span>3D Terrain</span></button><button data-page="valid">✓ <span>Validation</span></button><button data-page="data">▤ <span>Datasets</span></button><button data-page="report">▧ <span>Reports</span></button></nav><div class="foot">● Pipeline Ready<br><b style="color:white">ISRO • Department of Space</b><br>Theme: Miscellaneous</div></aside>
+<main class="main">
+<section id="dash" class="page active"><div class="top"><div><div class="ey">ISRO • DEPARTMENT OF SPACE</div><div class="title">DepthWizard</div><div class="sub">Single-View Height Estimation and 3D Flythrough • SIH26175</div></div><button class="btn primary" data-go="ingest">Start Reconstruction →</button></div><div class="grid4"><div class="card"><div class="label">Pipeline</div><div class="metric green">READY</div><div class="label">6-stage workflow</div></div><div class="card"><div class="label">Input modes</div><div class="metric">2</div><div class="label">RGB + GeoTIFF</div></div><div class="card"><div class="label">Products</div><div class="metric">4</div><div class="label">Depth • rDSM • DSM • Mesh</div></div><div class="card"><div class="label">Evaluation</div><div class="metric">50 / 50</div><div class="label">Accuracy / Visualization</div></div></div><div class="card process-card" style="margin-top:12px">
+<h3>Processing status</h3>
+<div class="process-track" id="processTrack">
+  <div class="process-item active" data-stage="1"><span>01</span><b>Ingestion</b></div>
+  <div class="process-item" data-stage="2"><span>02</span><b>Depth</b></div>
+  <div class="process-item" data-stage="3"><span>03</span><b>Scale</b></div>
+  <div class="process-item" data-stage="4"><span>04</span><b>DSM</b></div>
+  <div class="process-item" data-stage="5"><span>05</span><b>3D Terrain</b></div>
+  <div class="process-item" data-stage="6"><span>06</span><b>Validation</b></div>
+</div>
+<div class="process-meta"><span id="processStatus">Ready for image upload</span><span id="processPercent">0%</span></div>
+<div class="process-line"><i id="processBar"></i></div>
+</div>
+<div class="card" style="margin-top:12px"><h3>End-to-end pipeline</h3><div class="steps"><div class="step"><b>01 Image Ingestion</b><small>PNG / JPG / TIFF</small></div><div class="step"><b>02 Depth Inference</b><small>Monocular model</small></div><div class="step"><b>03 Scale Calibration</b><small>SRTM / GCP</small></div><div class="step"><b>04 DSM Generation</b><small>Metric / relative</small></div><div class="step"><b>05 3D Flythrough</b><small>Terrain mesh</small></div><div class="step"><b>06 Validation</b><small>RMSE / MAE / R</small></div></div></div><div class="grid2" style="margin-top:12px"><div class="card"><h3>Problem-aligned workflow</h3><div class="row"><b>Non-georeferenced PNG/JPG</b><span class="pill">Relative DSM</span></div><div class="row"><b>Georeferenced GeoTIFF</b><span class="pill">Absolute DSM</span></div><div class="row"><b>Scale reference</b><span class="pill">SRTM 30 m / GCP</span></div><div class="row"><b>Rendering</b><span class="pill">3D + First Person</span></div></div><div class="card"><h3>Evaluation criteria</h3><div class="row"><b>DSM estimation</b><span class="pill">50%</span></div><div class="row"><b>Visualization / UX</b><span class="pill">50%</span></div><div class="notice">Prototype values in this UI are illustrative. Real model inference and reference-data validation must replace them before claiming experimental accuracy.</div></div></div></section>
+<section id="ingest" class="page"><div class="top"><div><div class="ey">STAGE 01 • IMAGE INGESTION</div><div class="title">Remote-Sensing Image Input</div><div class="sub">PNG/JPG produce rDSM; GeoTIFF follows metric DSM calibration.</div></div><button class="btn primary" data-go="depth">Continue →</button></div><div class="grid2"><div class="card"><h3>Upload optical imagery</h3><div id="drop" class="drop"><div><div class="upload">⇧</div><b>Drop PNG / JPG / TIFF</b><p class="muted">Single-view optical RGB remote-sensing image</p><button id="chooseBtn" class="btn primary">Choose Image</button></div></div><input id="file" type="file" accept=".png,.jpg,.jpeg,.tif,.tiff" hidden><img id="preview" class="preview" alt="Selected image preview"><div class="grid2"><div class="field"><small>Format</small><b id="fmt">Waiting</b></div><div class="field"><small>Georeference</small><b id="geo">Waiting</b></div></div><div class="field"><small>Selected file</small><b id="fname">None</b></div></div><div class="card"><h3>Validation</h3><div class="row"><b>Supported format</b><span id="v1" class="pill wait">WAITING</span></div><div class="row"><b>RGB bands</b><span class="pill ok">EXPECTED</span></div><div class="row"><b>Spatial metadata</b><span id="gstatus" class="pill">OPTIONAL</span></div><div class="row"><b>Output mode</b><span id="mode" class="pill">AUTO</span></div><div class="row"><b>Image dimensions</b><span id="dims" class="pill">—</span></div>
+<div class="row"><b>File size</b><span id="fsize" class="pill">—</span></div>
+<div class="row"><b>Image type</b><span id="itype" class="pill">—</span></div><h3 style="margin-top:18px">Processing rule</h3><p class="muted">PNG/JPG → relative surface. GeoTIFF → scale calibration using SRTM 30 m or limited GCPs → absolute metric surface.</p></div></div></section>
+<section id="depth" class="page"><div class="top"><div><div class="ey">STAGE 02 • ELEVATION EXTRACTION</div><div class="title">Monocular Depth Estimation</div><div class="sub">Browser demo simulates the processing pipeline; connect a real model backend for actual inference.</div></div><button id="runDepthBtn" class="btn primary">Run Depth Inference</button></div><div class="grid2"><div class="card"><h3>Relative depth map</h3>
+<canvas id="depthCanvas" class="depth-canvas" width="640" height="380"></canvas>
+<div class="depth-tools">
+  <label>Depth contrast <input id="depthContrast" type="range" min="70" max="140" value="100"></label>
+  <button id="resetDepthBtn" class="btn">Reset View</button>
+</div>
+</div><div class="card"><h3>Inference configuration</h3><div class="field"><small>Backbone</small><b>Pre-trained monocular depth estimator</b></div><div class="field"><small>Output</small><b id="dmodel">Waiting for demo</b></div><div class="row"><b>Input</b><span id="dinput" class="pill">None</span></div><div class="row"><b>Mode</b><span id="dmode" class="pill wait">READY</span></div><div class="stats"><div class="stat"><small>Scale</small><b id="scale">—</b></div><div class="stat"><small>RMSE</small><b id="rmse">—</b></div><div class="stat"><small>MAE</small><b id="mae">—</b></div><div class="stat"><small>Correlation</small><b id="corr">—</b></div></div></div></div></section>
+<section id="cal" class="page"><div class="top"><div><div class="ey">STAGE 03 • SCALE CALIBRATION</div><div class="title">Relative → Metric Elevation</div><div class="sub">Demo mode uses simulated reference mapping; a GeoTIFF is not required for this presentation.</div></div><button id="calibrateBtn" class="btn primary">Calibrate Scale</button></div><div class="grid3"><div class="card"><h3>Reference</h3><select id="refSelect"><option>SRTM 30 m DEM</option><option>Ground Control Points</option><option>Scene statistics</option></select><div class="row"><b>Status</b><span id="calStatus" class="pill ok">DEMO READY</span></div></div><div class="card"><h3>Mapping</h3><select><option>Robust affine mapping</option><option>DEM-guided regression</option><option>GCP constrained fit</option></select><div class="row"><b>Scale factor</b><b class="cyan" id="scaleFactor">—</b></div></div><div class="card"><h3>Residual</h3><div class="metric" id="calrmse">—</div><div class="muted">Demo median absolute residual</div></div></div><div class="card" style="margin-top:12px"><div class="notice"><b>Demo Mode:</b> calibration is simulated for presentation and does not require a GeoTIFF. The displayed scale factor and residual are illustrative values, not measured geospatial results. Real metric calibration should use georeferenced imagery with an appropriate DEM or GCPs.</div></div></section>
+<section id="dsm" class="page"><div class="top"><div><div class="ey">STAGE 04 • SURFACE MODEL</div><div class="title">DSM / rDSM Products</div><div class="sub">Inspect depth, elevation and slope representations.</div></div><button class="btn primary" data-go="terrain">Open 3D Terrain →</button></div><div class="grid2"><div class="card"><h3>Elevation surface</h3><div class="viewer"><div class="heat"></div></div></div><div class="card"><h3>Generated product</h3><div class="row"><b>Type</b><span id="dsmType" class="pill">Awaiting input</span></div><div class="row"><b>Min elevation</b><b>558 m</b></div><div class="row"><b>Max elevation</b><b>1,842 m</b></div><div class="row"><b>Mean slope</b><b>17.8°</b></div><button id="exportDsmBtn" class="btn">Export DSM</button></div></div></section>
+<section id="terrain" class="page"><div class="top"><div><div class="ey">STAGE 05 • VISUALIZATION</div><div class="title">Interactive 3D Terrain</div><div class="sub">Optical texture projected onto a generated terrain mesh.</div></div><div><button id="resetBtn" class="btn">Reset</button> <button id="flyBtn" class="btn primary">First-Person Flythrough</button></div></div><div class="card"><div class="terrain"><canvas id="cv"></canvas><div class="hud"><span>DSM SURFACE</span><span id="hudInfo">ALT 1,284 m • SLOPE 17.8°</span></div><div class="views"><button id="rotLeft">←</button><button id="rotRight">→</button><button id="zoomIn">＋</button><button id="zoomOut">−</button></div></div></div><div class="terrain-stats card">
+  <div><small>Min elevation</small><b>558 m</b></div>
+  <div><small>Max elevation</small><b>1,842 m</b></div>
+  <div><small>Mean slope</small><b>17.8°</b></div>
+  <div><small>Mesh status</small><b class="green">READY</b></div>
+</div>
+<div class="controls"><div class="control"><b>Vertical exaggeration</b><input id="ex" type="range" min="1" max="5" value="2"></div><div class="control"><b>Render mode</b><select id="renderMode"><option value="surface">DSM Surface</option><option value="elev">Elevation</option><option value="slope">Slope</option><option value="hill">Hillshade</option></select></div><div class="control"><b>Texture</b><select id="texture"><option>Original RGB optical</option><option>Elevation tint</option><option>None</option></select></div><div class="control"><b>Analysis</b><button id="measureBtn" class="btn">Measure Height</button></div></div></section>
+<section id="valid" class="page"><div class="top"><div><div class="ey">STAGE 06 • EVALUATION</div><div class="title">DSM Accuracy & Validation</div><div class="sub">Compare predicted elevations against LiDAR or reference elevation data.</div></div><button id="validateBtn" class="btn primary">Run Validation</button></div><div class="grid4"><div class="card"><div class="label">RMSE</div><div class="metric" id="valRmse">—</div><div class="green">demo value</div></div><div class="card"><div class="label">MAE</div><div class="metric" id="valMae">—</div><div class="green">demo value</div></div><div class="card"><div class="label">Correlation</div><div class="metric" id="valCorr">—</div><div class="green">demo value</div></div><div class="card"><div class="label">Reference</div><div class="metric">SRTM</div><div class="muted">or LiDAR / reference DSM</div></div></div><div class="grid2" style="margin-top:12px"><div class="card"><h3>Error map</h3><div class="viewer"><div style="width:88%;height:70%;background:linear-gradient(90deg,#174c3c,#56e0a3,#54dfff,#54dfff);border-radius:8px"></div></div></div><div class="card"><h3>Landscape stability</h3><table><tr><th>Landscape</th><th>RMSE demo</th><th>Status</th></tr><tr><td>Urban</td><td>11.4 m</td><td class="green">Stable</td></tr><tr><td>Sparse</td><td>9.7 m</td><td class="green">Stable</td></tr><tr><td>Hilly</td><td>15.2 m</td><td class="cyan">Review</td></tr><tr><td>Forested</td><td>18.6 m</td><td>Review</td></tr></table></div></div></section>
+<section id="data" class="page"><div class="top"><div><div class="ey">DATA SOURCES</div><div class="title">Datasets & References</div><div class="sub">Sources explicitly referenced by the SIH26175 specification.</div></div></div><div class="grid3"><div class="card"><h3>SIH2026 reference repository</h3><p class="muted">IMG-PROCESS-SAC / SIH-DepthWizard-2026</p><div class="row"><b>Purpose</b><span class="pill">DepthWizard dataset</span></div><div class="row"><b>Status</b><span class="pill ok">PUBLIC</span></div></div><div class="card"><h3>SRTM 30 m</h3><p class="muted">Lower-resolution DEM source mentioned for scale mapping.</p><div class="row"><b>Role</b><span class="pill">Calibration</span></div></div><div class="card"><h3>Open high-resolution imagery</h3><p class="muted">Problem statement permits openly available remote-sensing datasets for development.</p><div class="row"><b>Formats</b><span class="pill">PNG • JPG • TIFF</span></div></div></div></section>
+<section id="report" class="page"><div class="top"><div><div class="ey">TECHNICAL DOCUMENTATION</div><div class="title">SIH26175 Mission Report</div><div class="sub">A presentation-ready summary aligned to the supplied specification.</div></div><button id="reportBtn" class="btn primary">Export Report</button></div><div class="card"><p><b>Organization:</b> Indian Space Research Organisation (ISRO)<br><b>Department:</b> Department of Space / ISRO<br><b>Category:</b> Software<br><b>Theme:</b> Miscellaneous</p><p><b>Objective:</b> Transform single-view optical RGB remote-sensing images into elevation maps and interactive 3D terrain.</p><p><b>Non-georeferenced:</b> PNG/JPG → Relative DSM (rDSM).</p><p><b>Georeferenced:</b> GeoTIFF → Absolute DSM with metric heights, using SRTM 30 m or limited GCPs for scale calibration.</p><p><b>Visualization:</b> Project original optical imagery onto a generated terrain mesh and support first-person navigation plus structural-height and slope analysis.</p><p><b>Evaluation:</b> RMSE, MAE and correlation against LiDAR/reference data; visualization quality, projection accuracy, fidelity, navigation, UX, stability and standalone deployment.</p><div class="notice">All numerical metrics in this prototype are illustrative UI values. They are not claimed measurements from the ISRO/SAC dataset.</div></div></section>
+</main><div id="toast" class="toast"></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const pages=[...document.querySelectorAll('.page')], nav=[...document.querySelectorAll('.nav button')];
+let chosen=null, ang=0, z=1, mode3='surface', objectUrl=null;
+function go(id){if(!$(id))return;pages.forEach(p=>p.classList.toggle('active',p.id===id));nav.forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='terrain')setTimeout(size,30);document.body.classList.remove('sidebar-open');document.body.classList.add('sidebar-hidden');window.scrollTo({top:0,behavior:'smooth'});}
+
+const processLabels=['Ready for image upload','Image ingestion complete','Depth inference complete','Scale calibration complete','DSM generation complete','3D terrain ready','Validation complete'];
+function setProcessStage(stage){
+  stage=Math.max(0,Math.min(6,stage));
+  document.querySelectorAll('.process-item').forEach((el,i)=>{
+    el.classList.toggle('active',i+1===stage);
+    el.classList.toggle('done',i+1<stage);
+  });
+  const pct=Math.round(stage/6*100);
+  const bar=$('processBar'), status=$('processStatus'), percent=$('processPercent');
+  if(bar)bar.style.width=pct+'%';
+  if(status)status.textContent=processLabels[stage]||processLabels[0];
+  if(percent)percent.textContent=pct+'%';
+}
+let toastTimer;
+function toast(s){
+  const t=$('toast');
+  if(!t)return;
+  clearTimeout(toastTimer);
+  t.textContent=s;
+  t.style.display='block';
+  toastTimer=setTimeout(()=>{t.style.display='none'},1800);
+}
+nav.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+const sidebarToggle=$('sidebarToggle'), sidebarClose=$('sidebarClose');
+function openSidebar(){document.body.classList.remove('sidebar-hidden');document.body.classList.add('sidebar-open')}
+sidebarToggle.addEventListener('click',openSidebar);
+sidebarClose.addEventListener('click',()=>{document.body.classList.remove('sidebar-open');document.body.classList.add('sidebar-hidden')});
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+const file=$('file'),drop=$('drop'),preview=$('preview');
+function openFilePicker(){file.click()}
+$('chooseBtn').addEventListener('click',openFilePicker);drop.addEventListener('click',e=>{if(e.target!==$('chooseBtn'))openFilePicker()});
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.style.borderColor='#54dfff'});drop.addEventListener('dragleave',()=>drop.style.borderColor='');drop.addEventListener('drop',e=>{e.preventDefault();drop.style.borderColor='';if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+file.addEventListener('change',()=>{if(file.files[0])handleFile(file.files[0])});
+function handleFile(f){const ext=(f.name.split('.').pop()||'').toLowerCase();if(!['png','jpg','jpeg','tif','tiff'].includes(ext)){toast('Unsupported file. Use PNG, JPG or TIFF.');return}chosen=f;if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(f);setProcessStage(1);preview.src=objectUrl;preview.style.display='block';drop.classList.add('hidden');$('fmt').textContent=ext.toUpperCase();$('fname').textContent=f.name;$('v1').textContent='VALID';$('v1').className='pill ok';const geo=ext==='tif'||ext==='tiff';$('geo').textContent=geo?'GeoTIFF':'RGB / non-georeferenced';$('gstatus').textContent=geo?'Geo metadata path':'No georeference';$('gstatus').className=geo?'pill ok':'pill';$('mode').textContent=geo?'ABSOLUTE DSM':'RELATIVE rDSM';$('dsmType').textContent=geo?'Absolute DSM':'Relative rDSM';$('dims').textContent='Loading…';$('fsize').textContent=(f.size/1024/1024).toFixed(2)+' MB';$('itype').textContent=f.type||ext.toUpperCase();const im=new Image();im.onload=()=>{$('dims').textContent=im.width+' × '+im.height};im.src=objectUrl;toast('Image loaded — validation updated')}
+function downloadTxt(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Export created')}
+$('runDepthBtn').addEventListener('click',runDepth);
+$('depthContrast').addEventListener('input',e=>{
+  const c=$('depthCanvas');
+  c.style.filter='contrast('+e.target.value+'%)';
+});
+$('resetDepthBtn').addEventListener('click',()=>{
+  $('depthContrast').value=100;
+  $('depthCanvas').style.filter='';
+  drawDepthDemo();
+});
+
+function runDepth(){if(!chosen){toast('Upload an image first');go('ingest');return}go('depth');setProcessStage(2);$('demoModal').style.display='flex';$('demoBar').style.width='0%';const stages=['Reading RGB image…','Estimating relative depth…','Calibrating scale…','Generating DSM/rDSM…','Building terrain…','Preparing validation…'];let i=0;const timer=setInterval(()=>{if(i>=stages.length){clearInterval(timer);return}$('demoText').textContent=stages[i];$('demoBar').style.width=((i+1)/stages.length*100)+'%';i++;if(i===stages.length){clearInterval(timer);setTimeout(()=>{$('demoModal').style.display='none';$('dmode').textContent='BROWSER DEMO';$('dmodel').textContent='Local visualization engine';$('dinput').textContent=chosen.name;$('scale').textContent='1.00×';$('rmse').textContent='2.4 m';$('mae').textContent='1.6 m';$('corr').textContent='0.93';drawDepthDemo();$('valRmse').textContent='2.4 m';$('valMae').textContent='1.6 m';$('valCorr').textContent='0.93';setProcessStage(4);setTimeout(()=>setProcessStage(5),250);toast('Demo reconstruction complete')},350)}},350)}
+function drawDepthDemo(){const c=$('depthCanvas');const x=c.getContext('2d'),w=c.width,h=c.height;x.clearRect(0,0,w,h);const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#0b2630');g.addColorStop(.35,'#23717d');g.addColorStop(.7,'#54dfff');g.addColorStop(1,'#b4df9b');x.fillStyle=g;x.fillRect(0,0,w,h);for(let i=0;i<18;i++){x.strokeStyle='rgba(3,17,23,.28)';x.beginPath();x.arc(40+i*32,190+Math.sin(i)*50,18+(i%4)*5,0,Math.PI*2);x.stroke()}}
+$('calibrateBtn').addEventListener('click',()=>{
+  if(!chosen){toast('Upload an image first');go('ingest');return}
+  const btn=$('calibrateBtn'),status=$('calStatus');
+  btn.disabled=true;btn.textContent='Calibrating…';
+  if(status){status.textContent='PROCESSING';status.className='pill wait'}
+  setTimeout(()=>{
+    $('scaleFactor').textContent='1.83× demo';
+    $('calrmse').textContent='8.6 m';
+    if(status){status.textContent='DEMO COMPLETE';status.className='pill ok'}
+    btn.disabled=false;btn.textContent='Calibrate Scale';
+    setProcessStage(3);
+    toast('Demo scale calibration complete — GeoTIFF not required');
+  },700);
+});
+$('exportDsmBtn').addEventListener('click',()=>downloadTxt('depthwizard_dsm.txt','DepthWizard DSM prototype export\nInput: '+(chosen?chosen.name:'none')+'\nValues are illustrative demo output.'));
+$('reportBtn').addEventListener('click',()=>downloadTxt('DepthWizard_report.txt','DepthWizard — SIH26175\nISRO / Department of Space\n\nSingle-view RGB remote-sensing image → monocular depth → scale calibration → DSM/rDSM → 3D terrain → validation.\n\nPNG/JPG: relative DSM. GeoTIFF: absolute metric DSM using SRTM 30 m or limited GCPs.\n\nDemo metrics shown in the UI are illustrative and must be replaced with measured results.'));
+$('validateBtn').addEventListener('click',()=>{
+  const btn=$('validateBtn');
+  btn.disabled=true;
+  btn.textContent='Validating…';
+  setTimeout(()=>{
+    $('valRmse').textContent=$('rmse').textContent==='—'?'2.4 m':$('rmse').textContent;
+    $('valMae').textContent=$('mae').textContent==='—'?'1.6 m':$('mae').textContent;
+    $('valCorr').textContent=$('corr').textContent==='—'?'0.93':$('corr').textContent;
+    setProcessStage(6);
+    btn.disabled=false;
+    btn.textContent='Run Validation';
+  },500);
+});
+$('resetBtn').addEventListener('click',()=>{ang=0;z=1;draw()});$('flyBtn').addEventListener('click',()=>toast(''));$('rotLeft').addEventListener('click',()=>rot(-1));$('rotRight').addEventListener('click',()=>rot(1));$('zoomIn').addEventListener('click',()=>zoom(1));$('zoomOut').addEventListener('click',()=>zoom(-1));$('measureBtn').addEventListener('click',()=>toast('Height measurement tool armed'));
+$('ex').addEventListener('input',draw);$('renderMode').addEventListener('change',e=>{mode3=e.target.value;draw()});
+function size(){const c=$('cv');if(!c)return;const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=Math.max(1,Math.floor(r.width*d));c.height=Math.max(1,Math.floor(r.height*d));draw()}
+function rot(d){ang+=d*.15;draw()}function zoom(d){z=Math.max(.7,Math.min(1.5,z+d*.1));draw()}
+function draw(){const c=$('cv');if(!c)return;const x=c.getContext('2d'),w=c.width,h=c.height;x.fillStyle='#071319';x.fillRect(0,0,w,h);const cols=38,rows=25,ex=+$('ex').value,pts=[];for(let y=0;y<rows;y++){pts[y]=[];for(let q=0;q<cols;q++){const a=q/(cols-1),b=y/(rows-1);pts[y][q]=Math.sin(a*8+ang)*.13+Math.sin(b*10)*.1+Math.sin((a+b)*13)*.07+Math.exp(-((a-.62)**2+(b-.42)**2)*20)*.42}}const cx=w/2,cy=h*.49,sc=Math.min(w,h)*.95*z;function p(a,b,q){const X=(a-.5)*sc,Y=(b-.5)*sc*.65,A=ang,rx=X*Math.cos(A)-Y*Math.sin(A),ry=X*Math.sin(A)+Y*Math.cos(A);return[cx+rx,cy+ry-q*sc*.35*ex]}for(let y=0;y<rows-1;y++)for(let q=0;q<cols-1;q++){const q1=pts[y][q],q2=pts[y][q+1],q3=pts[y+1][q+1],q4=pts[y+1][q],a=p(q/(cols-1),y/(rows-1),q1),b=p((q+1)/(cols-1),y/(rows-1),q2),d=p((q+1)/(cols-1),(y+1)/(rows-1),q3),e=p(q/(cols-1),(y+1)/(rows-1),q4);let v;if(mode3==='slope')v=`rgb(${100+q1*80},${130+q1*40},70)`;else if(mode3==='elev')v=`rgb(${80+q1*100},${150+q1*60},${110-q1*40})`;else if(mode3==='hill')v=`rgb(${45+q1*90},${75+q1*90},${75+q1*60})`;else v=`rgb(${30+q1*70},${105+q1*80},${105+q1*60})`;x.fillStyle=v;x.beginPath();x.moveTo(...a);x.lineTo(...b);x.lineTo(...d);x.lineTo(...e);x.closePath();x.fill()}x.strokeStyle='#9ce4e822';for(let y=0;y<rows;y++){x.beginPath();for(let q=0;q<cols;q++){const a=p(q/(cols-1),y/(rows-1),pts[y][q]);q?x.lineTo(...a):x.moveTo(...a)}x.stroke()}for(let q=0;q<cols;q++){x.beginPath();for(let y=0;y<rows;y++){const a=p(q/(cols-1),y/(rows-1),pts[y][q]);y?x.lineTo(...a):x.moveTo(...a)}x.stroke()}}
+window.addEventListener('resize',()=>{if($('terrain').classList.contains('active'))size()});
+go('dash');
+</script>
+</body>
+</html>
